@@ -5,7 +5,6 @@ class SpotifyPlayer {
     this.accessToken = null;
     this.exchangeHost = options.exchangeHost || 'https://spotify-player.herokuapp.com';
     this.obtainingToken = false;
-    this.loopInterval = null;
   }
 
   on(eventType, callback) {
@@ -61,6 +60,7 @@ class SpotifyPlayer {
               if (data !== null && data.item !== null) {
                 this.dispatch('update', data);
               }
+              setTimeout(loop.bind(this), 1500);
             })
             .catch(e => {
               console.log('Logging user out due to error', e);
@@ -70,18 +70,12 @@ class SpotifyPlayer {
       };
       this.fetchUser().then(user => {
         this.dispatch('login', user);
-        this.loopInterval = setInterval(loop.bind(this), 1500);
         loop();
       });
     }
   }
 
   logout() {
-    // clear loop interval
-    if (this.loopInterval !== null) {
-      clearInterval(this.loopInterval);
-      this.loopInterval = null;
-    }
     this.accessToken = null;
     this.dispatch('login', null);
   }
